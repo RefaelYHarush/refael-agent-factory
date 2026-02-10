@@ -10,13 +10,14 @@ const supabaseAdmin = createClient(
 // GET /api/agents/[id] - Get single agent
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const { data: agent, error } = await supabaseAdmin
       .from('agents')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -32,7 +33,7 @@ export async function GET(
 
     return NextResponse.json(agent);
   } catch (error: any) {
-    console.error(`GET /api/agents/${params.id} error:`, error);
+    console.error(`GET /api/agents/${id} error:`, error);
     return NextResponse.json(
       { error: error.message || 'Failed to fetch agent' },
       { status: 500 }
@@ -43,8 +44,9 @@ export async function GET(
 // PATCH /api/agents/[id] - Update agent
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const body = await request.json();
 
@@ -54,7 +56,7 @@ export async function PATCH(
     const { data: agent, error } = await supabaseAdmin
       .from('agents')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -64,7 +66,7 @@ export async function PATCH(
 
     return NextResponse.json(agent);
   } catch (error: any) {
-    console.error(`PATCH /api/agents/${params.id} error:`, error);
+    console.error(`PATCH /api/agents/${id} error:`, error);
     return NextResponse.json(
       { error: error.message || 'Failed to update agent' },
       { status: 500 }
@@ -75,13 +77,14 @@ export async function PATCH(
 // DELETE /api/agents/[id] - Delete agent
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const { error } = await supabaseAdmin
       .from('agents')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       throw error;
@@ -89,7 +92,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error(`DELETE /api/agents/${params.id} error:`, error);
+    console.error(`DELETE /api/agents/${id} error:`, error);
     return NextResponse.json(
       { error: error.message || 'Failed to delete agent' },
       { status: 500 }
